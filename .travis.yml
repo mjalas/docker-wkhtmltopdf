@@ -1,0 +1,16 @@
+
+sudo: required
+
+services:
+    - docker
+
+script:
+    - docker build -t mjalas/wkhtmltox .
+    - docker run --rm mjalas/wkhtmltox /bin/sh -c "echo Done!"    
+
+after_success:
+    - if [ "$TRAVIS_BRANCH" == "master" ]; then
+        docker tag $(docker images | grep mjalas/wkhtmltox | awk {'print $3'}) mjalas/wkhtmltox:latest
+        docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        docker push mjalas/wkhtmltox;
+      fi
